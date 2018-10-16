@@ -15,6 +15,7 @@ def create_dictionary(n):
         print("{0}:{1}".format(key, val))
 
 
+
 # Task 2:
 # Write a function that receives a string as its input parameter and
 # calculates the number of digits and letters in this string.
@@ -29,6 +30,8 @@ def letters_digits_dict(a_string):
             a_dict['letters'] += 1
     return a_dict
 
+
+
 # Task 3:
 # Write a function that receives two lists and returns a list that contains
 # only those elements (without duplicates) that appear in both input lists.
@@ -38,6 +41,7 @@ def common_elements(l1, l2):
     # s2 = set(l2)
     # return list(s1.intersection(s2))
     return list(set(l1).intersection(set(l2)))
+
 
 
 # Task 4:
@@ -62,6 +66,8 @@ def same_when_reversed(s1, s2):
     str1 = [ch for ch in s1.lower() if ch.isalnum()]
     str2 = [ch for ch in reversed(s2.lower()) if ch.isalnum()]
     return str1 == str2
+
+
 
 # Task 5:
 # Write a function that asks the user for a string and prints out
@@ -89,6 +95,7 @@ def palindrom():
     print("'{0}' is {1}".format(an_input, result))
 
 
+
 # Task 6:
 # Write a function to check whether a given string is a pangram or not.
 # Pangrams are sentences containing every letter of the alphabet at least once.
@@ -96,13 +103,18 @@ def palindrom():
 #
 # Hint: use ascii_lowercase from the string module to get all letters
 
-def pangram(a_string):
-    # return all(ascii_lowercase) in a_string
-    for ch in ascii_lowercase:
-        if ch not in a_string:
-            return False
-    return True
+# Option 1:
+# def pangram(a_string):
+#     for ch in ascii_lowercase:
+#         if ch not in a_string:
+#             return False
+#     return True
 
+
+# Option 2: using all()
+def pangram(a_string):
+    letters = [ch for ch in a_string.lower() if ch.isalpha()]
+    return all([(ch in letters) for ch in ascii_lowercase])
 
 
 
@@ -125,6 +137,8 @@ def all_even_digits():
             all_even.append(num)
     print(all_even)
 
+
+
 # Task 8:
 # Write a function that accepts a string input and returns slices of that
 # string according to the following rules:
@@ -137,6 +151,16 @@ def all_even_digits():
 # input: 'table'
 # result: ['ta', 'tab', 'tabl', 'table', 'ab', 'abl', 'able', 'bl', 'ble', 'le']
 
+def string_slices(a_string):
+    if len(a_string) < 3:
+        return [a_string]
+    result = []
+    for i in range(0, (len(a_string)-1)):
+        for j in range(i+1, len(a_string)):
+            result.append(a_string[i:(j+1)])
+    return result
+
+
 
 if __name__ == "__main__":
     # create_dictionary(5)
@@ -147,6 +171,8 @@ if __name__ == "__main__":
     # print(same_when_reversed("the 1st day", "yad,ts1,eht "))
     # print(same_when_reversed("ana", "hana"))
     # palindrom()
-    # print(pangram("The quick brown fox jumps over the lazy dog"))
-    # print(pangram("The quick brown fox jumps over the lazy cat"))
-    all_even_digits()
+    print(pangram("The quick brown fox jumps over the lazy dog"))
+    print(pangram("The quick brown fox jumps over the lazy cat"))
+    # all_even_digits()
+    # print(string_slices('are'))
+    # print(string_slices('table'))
