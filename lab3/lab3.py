@@ -1,3 +1,8 @@
+from operator import itemgetter
+from collections import defaultdict
+from statistics import mean, median
+from string import ascii_lowercase, ascii_uppercase, digits
+
 # Task 1
 # Write a function that receives a piece of text and computes the frequency of
 # the tokens appearing in the text (a token is a string of contiguous characters
@@ -9,8 +14,37 @@
 # in the decreasing order of the tokens' frequencies.
 # (hint: use itemgetter() f. from the operator module)
 
+# def token_frequencies(text):
+#     tokens = text.split()
+#     token_dict = dict()
+#     for token in set(tokens):
+#         token = token.lower().strip()
+#         token_dict[token] = 0
+#     for token in tokens:
+#         token_dict[token.lower().strip()] += 1
+#
+#     print("Token-based sort:")
+#     for key, val in sorted(token_dict.items()):
+#         print("{0}:{1}".format(key, val))
+#
+#     print("Frequency based sort:")
+#     for key, val in sorted(token_dict.items(), key=itemgetter(1), reverse=True):
+#         print("{0}:{1}".format(key, val))
 
+def token_frequencies(text):
+    tokens = text.split()
+    token_dict = defaultdict(int)
+    tokens = [token.lower().strip() for token in tokens]
+    for token in tokens:
+        token_dict[token] += 1
 
+    print("Token-based sort:")
+    for key, val in sorted(token_dict.items()):
+        print("{0}:{1}".format(key, val))
+
+    print("Frequency based sort:")
+    for key, val in sorted(token_dict.items(), key=itemgetter(1), reverse=True):
+        print("{0}:{1}".format(key, val))
 
 # Task 2
 # Write a function that accepts a sequence of comma separated passwords
@@ -26,6 +60,27 @@
 
 
 
+def check_passwords(passwords):
+    passwords = passwords.split(',')
+    valid_passwords = []
+    for password in passwords:
+        password = password.lstrip()
+        valid = [False]*6
+        for ch in password:
+            if ch in ascii_lowercase:
+                valid[0] = True
+            if ch in digits:
+                valid[1] = True
+            if ch in ascii_uppercase:
+                valid[2] = True
+            if ch in ['$', '#', '@']:
+                valid[3] = True
+        if 6 <= len(password) <= 12:
+            valid[4] = valid[5] = True
+        if all(valid):
+            valid_passwords.append(password)
+    print(valid_passwords)
+    print(", ".join(valid_passwords))
 
 # Task 3
 # Write a function that prompts the user for name, age, and height (in cm) of a couple of
@@ -51,7 +106,22 @@
 # The data for all team members should form a list of dicitonaries; this list is the return
 # value of the function.
 
-
+def members_data():
+    print("Please enter the data for each team member. Enter 'done' to terminate")
+    members_list = []
+    keys = ['name', 'age', 'height', 'weight', 'score']
+    while True:
+        user_input = input("Please enter name, age, height, weight, score in the given order\n")
+        if user_input == 'done':
+            break
+        member_data = user_input.split(",")
+        member_list = [member.strip() for member in member_data]
+        member_list[1] = int(member_list[1])
+        for i in range(2,5):
+            member_list[i] = float(member_list[i])
+        member_dict = dict(zip(keys, member_list))
+        members_list.append(member_dict)
+    return members_list
 
 
 
@@ -64,8 +134,21 @@
 #
 # Hint: the 'statistics' module provides functions for the required computations
 
+def team_statistics(team_members):
+    age_mean = mean([member['age'] for member in team_members])
+    height_mean = mean([member['height'] for member in team_members])
+    weight_mean = mean([member['weight'] for member in team_members])
+    score_median = median([member['score'] for member in team_members])
+    stats = [age_mean, height_mean, weight_mean, score_median]
+    print("Mean age:{0}; mean height:{1:.2f}; mean weight:{2:.2f}; median score:{3:.2f}".format(*stats))
 
-
+    max_score = 0
+    max_name = ""
+    for member in team_members:
+        if (member['age'] < 21) and (member['score'] > max_score):
+            max_score = member['score']
+            max_name = member['name']
+    print("Member with the highest score ({0:.2f}) is {1}.".format(max_score, max_name))
 
 
 # Task 6
@@ -93,16 +176,20 @@
 
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
     # for_token_freq = "New to Python or choosing between Python 2 and Python 3? Read Python 2 or Python 3."
+    # token_frequencies(for_token_freq)
 
-    # passwords = ["ABd1234@1, a F1#, 2w3E*, 2We3345"]
+    # passwords = "ABd1234@1, a F1#, 2w3E*, 2We3345, 2We3345$"
+    # check_passwords(passwords)
+    # members = members_data()
+    # print(members)
 
-
-    # team = [{'name': 'Bob', 'age': 18, 'height': 1.77, 'weight': 79.0, 'score': 50.0},
-    #              {'name': 'Tim', 'age': 17, 'height': 1.78, 'weight': 80.0, 'score': 84.0},
-    #              {'name': 'Jim', 'age': 19, 'height': 1.98, 'weight': 90.0, 'score': 94.0}]
+    team = [{'name': 'Bob', 'age': 18, 'height': 1.77, 'weight': 79.0, 'score': 50.0},
+            {'name': 'Tim', 'age': 17, 'height': 1.78, 'weight': 80.0, 'score': 84.0},
+            {'name': 'Jim', 'age': 19, 'height': 1.98, 'weight': 90.0, 'score': 94.0}]
+    team_statistics(team)
 
 
     # dishes = ["pizza", "sauerkraut", "paella", "hamburger"]
