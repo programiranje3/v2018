@@ -46,6 +46,8 @@ def token_frequencies(text):
     for key, val in sorted(token_dict.items(), key=itemgetter(1), reverse=True):
         print("{0}:{1}".format(key, val))
 
+
+
 # Task 2
 # Write a function that accepts a sequence of comma separated passwords
 # and checks their validity using the following criteria:
@@ -57,8 +59,6 @@ def token_frequencies(text):
 # 6. Maximum length: 12
 # Passwords that match the criteria should be printed in one row
 # separated by a comma.
-
-
 
 def check_passwords(passwords):
     passwords = passwords.split(',')
@@ -82,6 +82,8 @@ def check_passwords(passwords):
     print(valid_passwords)
     print(", ".join(valid_passwords))
 
+
+
 # Task 3
 # Write a function that prompts the user for name, age, and height (in cm) of a couple of
 # people (e.g. members of a sports team) and stores the input values as a list of tuples of
@@ -91,7 +93,23 @@ def check_passwords(passwords):
 # based on name, then height and finally age (so, the following sorting criteria should
 # be applied: 1) name, 2) height, 3) age).
 
+def team_members_data():
+    members = []
+    print("You are kindly asked to provide information about your team members")
+    while True:
+        name = input("Member's name:\n")
+        age = input("Age:\n")
+        height = input("Height (in cm):\n")
+        members.append((name, int(age), int(height)))
 
+        response = input("More members to add (Yes/No)?")
+        if response.lower() in ['no', 'n']:
+            break
+
+    # print(members)
+
+    for name, age, height in sorted(members, key=itemgetter(0,2,1)):
+        print("{0}, age:{1}, height:{2}".format(name, age, height))
 
 
 
@@ -121,6 +139,10 @@ def members_data():
             member_list[i] = float(member_list[i])
         member_dict = dict(zip(keys, member_list))
         members_list.append(member_dict)
+
+    # For the next class (lab 4):
+    # members_list = sorted(members_list, key=lambda member: (member['age'], member['score'], member['weight']))
+
     return members_list
 
 
@@ -159,7 +181,13 @@ def team_statistics(team_members):
 # should be turned into a dictionary where keys are country names and values
 # are the corresponding dishes.
 
-
+def lists_to_dict(l1, l2):
+    if len(l1) != len(l2):
+        print("lists have to be of the same lenght")
+    else:
+        a_dict = dict(zip(l1, l2))
+        for key in sorted(a_dict):
+            print(key + ": " + a_dict[key])
 
 
 
@@ -172,6 +200,12 @@ def team_statistics(team_members):
 #
 # Hint: consider using defaultdict from the collections module
 
+def total_class_counts(students_per_class):
+    counts_dict = defaultdict(int)
+    for cl, stud_count in students_per_class:
+        counts_dict[cl] += stud_count
+    for cl, stud_tot in sorted(counts_dict.items(), key=itemgetter(1), reverse=True):
+        print(cl + ": " + str(stud_tot))
 
 
 
@@ -183,15 +217,23 @@ if __name__ == '__main__':
 
     # passwords = "ABd1234@1, a F1#, 2w3E*, 2We3345, 2We3345$"
     # check_passwords(passwords)
+
+    # team_members_data()
+
     # members = members_data()
     # print(members)
 
     team = [{'name': 'Bob', 'age': 18, 'height': 1.77, 'weight': 79.0, 'score': 50.0},
             {'name': 'Tim', 'age': 17, 'height': 1.78, 'weight': 80.0, 'score': 84.0},
-            {'name': 'Jim', 'age': 19, 'height': 1.98, 'weight': 90.0, 'score': 94.0}]
+            {'name': 'Jim', 'age': 19, 'height': 1.98, 'weight': 90.0, 'score': 94.0},
+            {'name': 'Mark', 'age': 18, 'height': 1.80, 'weight': 85.0, 'score': 90.0}]
     team_statistics(team)
 
 
     # dishes = ["pizza", "sauerkraut", "paella", "hamburger"]
     # countries = ["Italy", "Germany", "Spain", "USA"]
+    # lists_to_dict(countries, dishes)
+
+    # l = [('V', 1), ('VI', 1), ('V', 2), ('VI', 2), ('VI', 3), ('VII', 1)]
+    # total_class_counts(l)
 
