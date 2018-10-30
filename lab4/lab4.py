@@ -1,3 +1,8 @@
+from functools import reduce, wraps
+from collections import defaultdict
+from statistics import mean, median
+from random import seed, randint
+
 # Task 1
 # Write a function that receives an arbitrary number of numeric values
 # and computes their product. The function also receives a named argument
@@ -8,8 +13,18 @@
 # 1) using a for loop
 # 2) using the reduce() f. from the functools package together with an appropriate lambda f.
 
+# def product(*numbers, absolute=False):
+#     result = 1
+#     for number in numbers:
+#         result *= number;
+#     if absolute:
+#         result = abs(result)
+#     return result
 
 
+def product(*numbers, absolute=False):
+    result = reduce(lambda x,y: x*y, numbers)
+    return result if not absolute else abs(result)
 
 # Task 2
 # Write a function that receives an arbitrary number of strings and returns a list
@@ -21,8 +36,19 @@
 # 1) using a for loop
 # 2) using the filter() f. together with an appropriate lambda f.
 
+# def select_strings(*strings, threshold=3):
+#     selection = []
+#     for s in strings:
+#         if (s[0].lower() == s[-1].lower()) and (len(set(s)) > threshold):
+#             selection.append(s)
+#     return selection
 
+# def select_strings(*strings, threshold=3):
+#     return [s for s in strings if (s[0].lower() == s[-1].lower()) and (len(set(s)) > threshold)]
 
+def select_strings(*strings, threshold=3):
+    f = lambda s: (s[0].lower() == s[-1].lower()) and (len(set(s)) > threshold)
+    return list(filter(f, strings))
 
 
 # Task 3
@@ -37,10 +63,20 @@
 # 1) using a for loop
 # 2) using the map() f. together with an appropriate lambda f.
 
+# def process_orders(orders, shipping=10):
+#     orders_dict = defaultdict(float)
+#     for order_id, prod_name, quantity, item_price in orders:
+#         orders_dict[order_id] += quantity * item_price
+#     for order_id, tot_value in orders_dict.items():
+#         if tot_value < 100:
+#             orders_dict[order_id] += shipping
+#     return [(order_id, tot_value) for order_id, tot_value in orders_dict.items()]
 
-
-
-
+def process_orders(orders, shipping=10):
+    processed_orders = map(lambda order: (order[0], order[2]*order[3]), orders)
+    processed_orders = map(lambda order: order if order[1] >= 100
+                            else (order[0], order[1]+shipping), processed_orders)
+    return list(processed_orders)
 
 # Task 4
 # Create a decorator that measures the time a function takes to execute
@@ -59,14 +95,29 @@
 #
 # Hint 2: to measure the time a function takes, use the perf_counter() function from the time module.
 
+def stopwatch(f):
+    from time import perf_counter
 
+    @wraps(f)
+    def wrapper_stopwatch(*args):
+        start_time = perf_counter()
+        result = f(*args)
+        end_time = perf_counter()
+        print("Function {0} was running for {1:.4f} seconds".format(f.__name__, end_time-start_time ))
+        return result
 
+    return wrapper_stopwatch
 
 # Write a function that for each number x in the range 1..n (n is the input parameter)
 # computes the sum: S(x) = 1 + 2 + ... + x-1 + x, and returns the sum of all S(x).
-# Decorate the function with the stopwatch_decorator.
+# Decorate the function with the stopwatch decorator.
 
-
+@stopwatch
+def sum_of_sums(n):
+    result = 0
+    for x in range(1, n+1):
+        result += sum(range(1, x+1))
+    return result
 
 
 # Write a function that creates a list by generating n random numbers between
@@ -75,7 +126,15 @@
 # between mean and median of the list elements. Decorate the function with
 # the stopwatch decorator.
 
-
+@stopwatch
+def random_numbers(n, k):
+    numbers = []
+    seed(1)
+    for _ in range(n):
+        number = randint(1,k)
+        numbers.append(number)
+        diff = mean(numbers) - median(numbers)
+        print("After adding {0}, the difference between mean and median is {1:.4f}".format(number, diff))
 
 
 # Task 5
@@ -101,20 +160,19 @@
 
 if __name__ == '__main__':
 
-    pass
-
     # print(product(1,-4,13,2))
+    # print()
     # print(product(1, -4, 13, 2, absolute=True))
 
-    # # calling the product function with a list
+    # calling the product function with a list
     # num_list = [2, 7, -11, 9, 24, -3]
-    # # this is NOT a way to make the call:
+    # this is NOT a way to make the call:
     # print(product(num_list))
-    # # instead, this is how it should be done:
+    # instead, this is how it should be done:
     # print(product(*num_list))
 
-    # str_list = ['yellowy', 'Bob', 'lovely', 'yesterday', 'too']
-    # print(string_selection(*str_list))
+    # str_list = ['Yellowy', 'Bob', 'lovely', 'yesterday', 'too']
+    # print(select_strings(*str_list, threshold=2))
 
     # orders = [("34587", "Learning Python, Mark Lutz", 4, 40.95),
     #           ("98762", "Programming Python, Mark Lutz", 5, 56.80),
@@ -123,8 +181,8 @@ if __name__ == '__main__':
     #
     # print(process_orders(orders))
 
-    # print(compute_sums(10000))
-    # random_numbers(100, 250)
+    # print(sum_of_sums(10000))
+    random_numbers(100, 250)
 
     # print(sum_of_powered_args(1,3,5,7,9, n=5))
 
