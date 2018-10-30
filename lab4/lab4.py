@@ -1,6 +1,6 @@
 from functools import reduce, wraps
 from collections import defaultdict
-from statistics import mean, median
+from statistics import mean, median, stdev
 from random import seed, randint
 
 # Task 1
@@ -146,7 +146,23 @@ def random_numbers(n, k):
 # Bonus: before calling the wrapped function, print, to the console,
 # its name with the list of input parameters (after standardisation)
 
+def standardise(f):
 
+    @wraps(f)
+    def standardise_wrapper(*args, **kwargs):
+        m = mean(args)
+        std = stdev(args)
+        st_args = [(arg-m)/std for arg in args]
+
+        print("Calling function " + f.__name__ +
+              "(" + ", ".join([str(arg) for arg in st_args]) + ", " +
+              ", ".join([key + "=" + str(val) for key, val in kwargs.items()]) + ")")
+
+        result = f(*st_args, **kwargs)
+
+        return round(result, 4)
+
+    return standardise_wrapper
 
 
 # Write a function that receives an arbitrary number of int values
@@ -155,6 +171,13 @@ def random_numbers(n, k):
 # where n is the keyword argument with default value 10.
 # The function returns the sum of S(x) of all received int values.
 # Decorate the function with the standardise decorator.
+
+@standardise
+def sum_of_powered_args(*args, n=10):
+    result = 0
+    for arg in args:
+        result += sum([arg**i for i in range(1, n+1)])
+    return result
 
 
 
@@ -182,8 +205,8 @@ if __name__ == '__main__':
     # print(process_orders(orders))
 
     # print(sum_of_sums(10000))
-    random_numbers(100, 250)
+    # random_numbers(100, 250)
 
-    # print(sum_of_powered_args(1,3,5,7,9, n=5))
+    print(sum_of_powered_args(1,3,5,7,9, n=5))
 
 
