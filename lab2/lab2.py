@@ -114,6 +114,7 @@ def palindrom():
 # Option 2: using all()
 def pangram(a_string):
     letters = [ch for ch in a_string.lower() if ch.isalpha()]
+    print([(ch in letters) for ch in ascii_lowercase])
     return all([(ch in letters) for ch in ascii_lowercase])
 
 

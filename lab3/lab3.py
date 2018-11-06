@@ -141,7 +141,8 @@ def members_data():
         members_list.append(member_dict)
 
     # For the next class (lab 4):
-    # members_list = sorted(members_list, key=lambda member: (member['age'], member['score'], member['weight']))
+    members_list = sorted(members_list,
+            key=lambda member: (member['age'], member['score'], member['weight']))
 
     return members_list
 
