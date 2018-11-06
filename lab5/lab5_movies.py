@@ -18,39 +18,51 @@
 
 class Movie:
 
-    def __init__(self, title, year, director='', reviews=None):
+    def __init__(self, title, year, director = "unknown", reviews = []):
         self.title = title
         self.year = year
         self.director = director
         self.reviews = reviews
 
-        self.__i = 0                # iterator counter
+        self.rev_index = 0
 
     def __str__(self):
-        m = self.title + '\n'
-        m += '\tyear: ' + str(self.year) if self.year else '' + '\n'
-        m += '\tdirected by: ' + self.director + '\n' if self.director else 'unknown' + '\n'
-        m += '\treviews\n'
-        m += '\t\t\n'.join([str(r) for r in self.reviews]) if self.reviews else ''
-        return m
+        movie_str = self.title + "\n release year: " + str(self.year) + "\n director: " + self.director
+
+        if len(self.reviews) == 0:
+            movie_str += "\n reviews: no reviews so far"
+        else:
+            movie_str += "\n reviews:\n\t"
+            movie_str += "\n\t".join([str(review) for review in self.reviews])
+
+        return movie_str
+
+
+    def __eq__(self, other):
+        """Two Movie objects are considered equal if they have the same title and release year."""
+        if self.__class__ != other.__class__:
+            return False
+        return (self.title == other.title) and (self.year == other.year)
+
 
     def __iter__(self):
         return self
 
+
     def __next__(self):
-        if self.__i < len(self.reviews):
-            r = self.reviews[self.__i]
-            self.__i += 1
-            return r
-        else:
+        if self.rev_index == len(self.reviews):
             raise StopIteration
+        current_review = self.reviews[self.rev_index]
+        self.rev_index += 1
+        return current_review
+
 
 
 class MovieReview:
 
-    def __init__(self, rating, comment):
-        self.rating = rating
-        self.comment = comment
+    def __init__(self, rating, comment = ""):
+        self.rating = rating        # calling the setter for self.__rating
+        self.comment = comment      # calling the setter for self.__comment
 
     @property
     def rating(self):
@@ -58,8 +70,10 @@ class MovieReview:
 
     @rating.setter
     def rating(self, rating):
-        self.__rating = rating if rating in range(1, 6) \
-            else print('Error: rating must be between 1 and 5')
+        if 1 <= rating <=5:
+            self.__rating = rating
+        else:
+            print('Error in setting the rating value; values 1-5 only')
 
     @property
     def comment(self):
@@ -67,30 +81,42 @@ class MovieReview:
 
     @comment.setter
     def comment(self, comment):
-        self.__comment = comment if isinstance(comment, str) else 'no comment yet'
+        if isinstance(comment, str):
+            self.__comment = comment
+        else:
+            print('Error in setting the comment value; string values only')
+
 
     def __str__(self):
-        return '\tReview: ' + str(self.rating) + ', ' + self.comment
+        if self.comment != "":
+            return "rating: " + str(self.rating) + "; comment: " + self.comment
+        else:
+            return "rating: " + str(self.rating) + "; no comment provided"
+
 
 
 if __name__ == '__main__':
 
-    r1 = MovieReview(3, 'Not bad')
-    r2 = MovieReview(4, 'Good')
+    godfather = Movie("The Godfather", year=1972, director="Francis Ford Coppola")
+    print(godfather)
 
-    print(r1)
-    # r2.rating = 8
-
-    a_star_is_born = Movie("A Star is Born", 2018, "Bradley Cooper", [r1, r2])
-    print(a_star_is_born)
     print()
 
-    # for r in a_star_is_born:
-    #     print(r)
+    godfather_2 = Movie("The Godfather: part II", year=1974, director="Francis Ford Coppola")
+    print(godfather_2)
 
-    print(next(a_star_is_born))
-    print(next(a_star_is_born))
-    print(next(a_star_is_born))
+    print()
 
+    # if godfather == godfather_2:
+    #     print("No difference observed!")
+    # else:
+    #     print("Different movies!")
 
+    mr_1 = MovieReview(5, "Superb!")
+    mr_2 = MovieReview(5, "The best ever!")
+    godfather.reviews = [mr_1, mr_2]
 
+    print("Reviews of the Godfather movie:")
+    godfather_reviews = iter(godfather)
+    print(next(godfather_reviews))
+    print(next(godfather_reviews))
