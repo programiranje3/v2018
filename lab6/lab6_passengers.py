@@ -40,3 +40,95 @@
 #   the FlightServices enum: priority boarding, selection of food and drinks, free onboard wifi
 # - overridden __str__ method so that it first prints "Business class passenger" and then
 #   the available information about the passengers
+
+from enum import Enum
+
+class FlightService(Enum):
+    """snack, free e-journal, priority boarding, selection of food and drinks,
+    free onboard wifi, and an item for cases when services are not specified.
+    """
+    SNACK = "Snack"
+    FREE_EJOURNAL = "Free e-journal"
+    PRIORITY_BOARDING = "Priority boarding"
+    FOOD_AND_DRINKS = "Selection of food and drinks"
+    ONBOARD_WIFI = "Free onboard wifi"
+    UNDEFINED = "undefined"
+
+class Passenger:
+    services = [FlightService.UNDEFINED]
+
+    def __init__(self, name, passport, air_miles=0, checked_in=False):
+        self.name = name
+        self.passport = passport
+        self.air_miles = air_miles
+        self.checked_in = checked_in
+
+    @property
+    def passport(self):
+        return self.__passport
+
+    @passport.setter
+    def passport(self, passport):
+        if not isinstance(passport, str):
+            passport = str(passport)
+        if self.passport_format_ok(passport):
+            self.__passport = passport
+        else:
+            print("Error! Passport has to consist of 6 digits exactly")
+            self.__passport = "unknown"
+
+    @staticmethod
+    def passport_format_ok(passport):
+        if len(passport) != 6:
+            return False
+        all_digits = [ch.isdigit() for ch in passport]
+        return all(all_digits)
+
+    @classmethod
+    def available_services(cls):
+        return [service.value for service in cls.services]
+
+    def __str__(self):
+        passenger_str = self.name
+        passenger_str += "\nPassport: " + self.passport
+        passenger_str += "\nAir miles: " + str(self.air_miles)
+        passenger_str += "\nCompleted check-in: " + ("YES" if self.checked_in else "NO")
+        passenger_str += "\nServices: " + ", ".join(self.available_services())
+        return passenger_str
+
+
+class EconomyPassenger(Passenger):
+
+    services = [FlightService.SNACK, FlightService.FREE_EJOURNAL]
+
+    def candidate_for_upgrade(self, min_miles):
+        return self.checked_in and self.air_miles > min_miles
+
+    def __str__(self):
+        return "Economy class passenger:\n" + super().__str__()
+
+
+class BusinessPassenger(Passenger):
+
+    services = [FlightService.FOOD_AND_DRINKS, FlightService.PRIORITY_BOARDING,
+                FlightService.ONBOARD_WIFI]
+
+    def __str__(self):
+        return "Business class passenger:\n" + super().__str__()
+
+
+if __name__ == "__main__":
+
+    bob = EconomyPassenger("Bob", "123456", 2500, True)
+    print(bob)
+    print()
+
+    mike = EconomyPassenger("Mike", "123987")
+    print(mike)
+    print()
+
+    print(bob.candidate_for_upgrade(2000))
+    print(mike.candidate_for_upgrade(2000))
+
+    jane = BusinessPassenger("Jane", "345678", checked_in=True)
+    print(jane)
