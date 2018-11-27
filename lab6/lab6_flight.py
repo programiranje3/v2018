@@ -56,7 +56,7 @@ class Flight:
         try:
             self.__departure = datetime.strptime(departure_str, self.departure_format)
         except ValueError as err:
-            print("Error: " + err)
+            print("Error: " + str(err))
             self.__departure = "unknown"
 
     @property
@@ -99,3 +99,36 @@ class Flight:
 
 
 
+
+
+if __name__ == '__main__':
+
+    pass
+
+    # lh1411 = Flight('LH1411', '2018-11-03 6:50', origin='Belgrade', destination='Frankfurt')
+    # print(lh1411)
+    # print()
+
+    # lh992 = Flight.from_Frankfurt_by_Lufthansa('LH992', '2018-11-03 12:20')
+    # lh992.destination = "Amsterdam"
+    # print(lh992)
+    # print()
+    #
+    # bob = BusinessPassenger("Bob Smith", "123456", air_miles=1000, checked_in=True)
+    # john = EconomyPassenger("John Smith", "987654", checked_in=False)
+    # bill = EconomyPassenger("Billy Stone", "917253", air_miles=5000, checked_in=True)
+    # dona = EconomyPassenger("Dona Stone", "917253", air_miles=2500, checked_in=False)
+    # kate = EconomyPassenger("Kate Fox", "114252", air_miles=3500, checked_in=True)
+    #
+    # lh992.passengers.extend([bob, john, bill, dona, kate])
+
+    # print(f"After adding passengers to flight {lh1411.flight_num}:\n")
+    # print(lh1411)
+
+    # print("Last call to passengers who have not yet checked in!")
+    # for passenger in lh992.generate_non_checked_list():
+    #     print(passenger)
+
+    # print("Passengers offered an upgrade opportunity:")
+    # for ind, passenger in enumerate(lh1411.generate_upgrade_candidates(2000)):
+    #     print(str(ind+1) + ".\n" + str(passenger))
