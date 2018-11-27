@@ -74,6 +74,9 @@ class Flight:
         if len(flight_num) > 6 or len(flight_num) < 5:
             return False
 
+        # return all([ch.isalpha() for ch in flight_num[0:2]]) and \
+        #        all([ch.isdigit() for ch in flight_num[2:]])
+
         list=[False]*len(flight_num)
         if flight_num[0].isalpha():
             list[0]=True
