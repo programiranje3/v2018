@@ -15,8 +15,38 @@
 
 # Use the file 'file_q5c.txt'
 
+def read_sort_write(fname):
+    with_ext = []
+    no_ext = []
 
+    def sort_with_ext(item):
+        f, ext = item.lower().rsplit(".", maxsplit=1)
+        return ext, f
 
+    try:
+        with open(fname, 'r') as f:
+            lines = [line.rstrip('\n') for line in f.readlines()]
+            for line in lines:
+                if line.find('.') >= 0:
+                    with_ext.append(line)
+                else:
+                    no_ext.append(line)
+
+        no_ext = sorted(no_ext, key=lambda item: item.lower())
+        with_ext = sorted(with_ext, key=sort_with_ext)
+        # print("With extension:\n" + ", ".join(with_ext))
+        # print("No extension:\n" + ",".join(no_ext))
+
+        with open("task1_result.txt", 'w') as f:
+            f.write("\n".join(with_ext))
+            f.write("\n")
+        f.write("\n".join(no_ext))
+
+    except FileNotFoundError as fnf:
+        print("File {0} not found, cannot proceed".format(fname))
+        print(str(fnf))
+    except IOError as io_err:
+        print("Error: {}".format(io_err))
 
 
 # Task 2
@@ -84,9 +114,8 @@
 
 if __name__ == "__main__":
 
-    pass
 
-    # read_sort_write("data/file_q5c.txt")
+    read_sort_write("data/file_q5.txt")
 
     # read_write_city_data("data/cities_and_times.txt")
 

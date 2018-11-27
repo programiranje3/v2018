@@ -83,7 +83,7 @@ class Flight:
         if flight_num[1].isalpha():
             list[1]=True
         for p, ch in enumerate(flight_num[2:]):
-            if ch.isdigit(): list[p] = True
+            if ch.isdigit(): list[p+2] = True
         return all(list)
 
     @property
@@ -101,22 +101,63 @@ class Flight:
                     print("Error! {}. element of the input list is not Passenger".format(index+1))
 
 
+    def __str__(self):
+        flight_str = "Flight number: " + self.flight_num
+        flight_str += "\nDeparture: " + self.format_departure(self.departure)
+        flight_str += "\nOrigin: " + self.origin
+        flight_str += "\nDestination: " + self.destination
+        flight_str += "\nOperated by: " + self.operated_by
 
+        if len(self.passengers) == 0:
+            flight_str += "\nNo passenger yet registered."
+        else:
+            flight_str += "\n\n"
+            flight_str += "\n\n".join([str(p) for p in self.passengers])
+
+        return flight_str
+
+
+    @staticmethod
+    def format_departure(departure):
+        if isinstance(departure, str):
+            return departure
+
+        try:
+            return datetime.strftime(departure, "%Y/%m/%d %H/%M")
+        except TypeError as err:
+            print("Error while formatting departure:\n{}".format(err))
+            return "undefined"
+
+    @classmethod
+    def from_Frankfurt_by_Lufthansa(cls, flight_num, departure):
+        return cls(flight_num, departure, origin="Frankfurt", operated_by="Lufthansa")
+
+
+    def generate_non_checkedin_list(self):
+        for p in self.passengers:
+            if not p.checked_in:
+                yield p
+
+
+    def generate_upgrade_candidates(self, min_miles):
+        candidates = [p for p in self.passengers
+                       if isinstance(p, EconomyPassenger) and p.candidate_for_upgrade(min_miles)]
+        candidates = sorted(candidates, key=lambda passenger: passenger.air_miles, reverse=True)
+        for candidate in candidates:
+            yield candidate
 
 
 if __name__ == '__main__':
 
-    pass
+    lh1411 = Flight('LH1411', '2018-11-03 6:50', origin='Belgrade', destination='Frankfurt')
+    print(lh1411)
+    print()
 
-    # lh1411 = Flight('LH1411', '2018-11-03 6:50', origin='Belgrade', destination='Frankfurt')
-    # print(lh1411)
-    # print()
-
-    # lh992 = Flight.from_Frankfurt_by_Lufthansa('LH992', '2018-11-03 12:20')
+    lh992 = Flight.from_Frankfurt_by_Lufthansa('LH992', '2018-11-03 12:20')
     # lh992.destination = "Amsterdam"
-    # print(lh992)
+    print(lh992)
     # print()
-    #
+
     # bob = BusinessPassenger("Bob Smith", "123456", air_miles=1000, checked_in=True)
     # john = EconomyPassenger("John Smith", "987654", checked_in=False)
     # bill = EconomyPassenger("Billy Stone", "917253", air_miles=5000, checked_in=True)
@@ -125,13 +166,14 @@ if __name__ == '__main__':
     #
     # lh992.passengers.extend([bob, john, bill, dona, kate])
 
-    # print(f"After adding passengers to flight {lh1411.flight_num}:\n")
-    # print(lh1411)
+    # print(f"After adding passengers to flight {lh992.flight_num}:\n")
+    # print(lh992)
 
     # print("Last call to passengers who have not yet checked in!")
-    # for passenger in lh992.generate_non_checked_list():
+    # for passenger in lh992.generate_non_checkedin_list():
     #     print(passenger)
+    #     print()
 
     # print("Passengers offered an upgrade opportunity:")
-    # for ind, passenger in enumerate(lh1411.generate_upgrade_candidates(2000)):
+    # for ind, passenger in enumerate(lh992.generate_upgrade_candidates(2000)):
     #     print(str(ind+1) + ".\n" + str(passenger))
