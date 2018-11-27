@@ -1,0 +1,9 @@
+foo.123.txt
+list_data
+power.Log
+baz.TXT
+List_items
+Fav_books
+hello.RB
+loop.do.rb
+report_12.log
