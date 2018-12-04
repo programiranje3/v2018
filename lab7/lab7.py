@@ -193,7 +193,7 @@ def create_and_store_img_dict(cat_file_tuples):
     for category, image in cat_file_tuples:
         img_dict[category].append(image)
 
-    serialise_object("task3_results.pkl", img_dict)
+    serialise_object(img_dict, "task3_results.pkl")
 
     try:
         with shelve.open("task3_result_shelve") as s:
@@ -243,7 +243,7 @@ def write_common_numbers(fnum1, fnum2):
     # alternative:
     # commons_list = list(set(num_list_1).intersection(set(num_list_2)))
 
-    serialise_object("task4_results.pkl", commons_list)
+    serialise_object(commons_list, "task4_results.pkl")
 
 
 
@@ -252,7 +252,7 @@ if __name__ == "__main__":
 
     # read_sort_write("data/file_q5c.txt")
 
-    cities_and_times("data/cities_and_times.txt")
+    # cities_and_times("data/cities_and_times.txt")
 
     # image_categories("data/Training_01.txt")
 
@@ -260,6 +260,6 @@ if __name__ == "__main__":
     # t4_f2 = "data/happynumbers.txt"
     # write_common_numbers(t4_f1, t4_f2)
 
-    # with open("task4_results.pkl", "rb") as bf:
-    #     results = pickle.load(bf)
-    #     print(results)
+    with open("task4_results.pkl", "rb") as bf:
+        results = pickle.load(bf)
+        print(results)
