@@ -1,6 +1,9 @@
 from sys import stderr
 import pickle
 import csv
+import shelve
+from collections import Counter, defaultdict
+
 
 # Task 1
 # Write a function that reads in the content of the given text file, sorts it,
@@ -138,7 +141,66 @@ def write_to_csv(data, fname):
 # Note: for a nice quick introduction to the shelve module, see: https://pymotw.com/3/shelve/
 
 
+def image_categories(src_file):
 
+    cat_file_list = []
+
+    def get_file_category_tuple(fpath):
+        category, file = fpath.rstrip().rsplit("/", maxsplit=1)
+        return category[3:], file
+
+    try:
+        with open(src_file, 'r') as src_file:
+            lines = src_file.readlines()
+            cat_file_list = [get_file_category_tuple(line) for line in lines]
+
+    except FileNotFoundError as fnf_err:
+        print(fnf_err)
+    except IOError as io_err:
+        print(io_err)
+
+    else:
+        compute_and_store_category_counts(cat_file_list)
+        create_and_store_img_dict(cat_file_list)
+
+
+
+def compute_and_store_category_counts(cat_file_tuples):
+
+    categories = [cat for cat, file in cat_file_tuples]
+    category_counts = Counter(categories)
+
+    # alternative:
+    # from collections import defaultdict
+    # category_dict = defaultdict(int)
+    # for cat_file in cat_file_list:
+    #     category_dict[cat_file[0]] += 1
+
+    try:
+        with open("task3_results.csv", "w") as csvf:
+            csv_writer = csv.writer(csvf)
+            csv_writer.writerow(('category_name', 'image_count'))
+            for item in category_counts.items():
+                csv_writer.writerow(item)
+    except csv.Error as err:
+        print("Error while writing category counts to csv file:\n{}".format(err))
+
+
+
+def create_and_store_img_dict(cat_file_tuples):
+
+    img_dict = defaultdict(list)
+    for category, image in cat_file_tuples:
+        img_dict[category].append(image)
+
+    serialise_object("task3_results.pkl", img_dict)
+
+    try:
+        with shelve.open("task3_result_shelve") as s:
+            for key, val in img_dict.items():
+                s[key] = val
+    except IOError as io_err:
+        print(io_err)
 
 
 
@@ -156,6 +218,32 @@ def write_to_csv(data, fname):
 # list of prime numbers: http://www.practicepython.org/assets/primenumbers.txt
 # list of happy numbers: http://www.practicepython.org/assets/happynumbers.txt
 
+
+def write_common_numbers(fnum1, fnum2):
+
+    def read_numbers_from_file(fname):
+        num_list = list()
+        try:
+            with open(fname, 'r') as fobj:
+                lines = [line.rstrip('\n') for line in fobj.readlines()]
+                for line in lines:
+                    try:
+                        num_list.append(int(line))
+                    except ValueError as val_err:
+                        print("Cannot transform {0} to number due to: {1}".format(line, val_err))
+        except FileNotFoundError as fnf_err:
+            print(fnf_err)
+
+        return num_list
+
+    num_list_1 = read_numbers_from_file(fnum1)
+    num_list_2 = read_numbers_from_file(fnum2)
+
+    commons_list = [num for num in num_list_1 if num in num_list_2]
+    # alternative:
+    # commons_list = list(set(num_list_1).intersection(set(num_list_2)))
+
+    serialise_object("task4_results.pkl", commons_list)
 
 
 
