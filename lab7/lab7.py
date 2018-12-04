@@ -1,3 +1,7 @@
+from sys import stderr
+import pickle
+import csv
+
 # Task 1
 # Write a function that reads in the content of the given text file, sorts it,
 # and writes the (sorted) content to a new textual file ("task1_result.txt").
@@ -40,7 +44,7 @@ def read_sort_write(fname):
         with open("task1_result.txt", 'w') as f:
             f.write("\n".join(with_ext))
             f.write("\n")
-        f.write("\n".join(no_ext))
+            f.write("\n".join(no_ext))
 
     except FileNotFoundError as fnf:
         print("File {0} not found, cannot proceed".format(fname))
@@ -69,11 +73,54 @@ def read_sort_write(fname):
 # Note: for a list of things that can be pickled, see this page:
 # https://docs.python.org/3/library/pickle.html#pickle-picklable
 
+def cities_and_times(fname):
+
+    cities = []
+    try:
+        with open(fname, 'r') as f:
+            lines = [line.rstrip('\n') for line in f.readlines()]
+            for line in lines:
+                # city, the_rest = line.split('\t')
+                # day, time = the_rest.split()
+                # hour, min = time.split(':')
+                city, day, time = line.rsplit(maxsplit=2)
+                hour, min = time.split(':')
+                try:
+                    hour, min = int(hour), int(min)
+                    cities.append((city, day, (hour, min)))
+                except ValueError as val_err:
+                    stderr.write("Error while transforming time data:\n{}".format(val_err))
+
+            cities = sorted(cities, key=lambda item: item[0])
+
+            serialise_object(cities, "task2_results.pkl")
+            write_to_csv(cities, "task2_results.csv")
+
+    except FileNotFoundError as fnf_err:
+        stderr.write("Error, cannot proceed:\n{}".format(fnf_err))
+    except IOError as io_err:
+        stderr.write(str(io_err))
 
 
+def serialise_object(obj, fname):
 
+    try:
+        with open(fname, 'wb') as f:
+            pickle.dump(obj, f)
+    except pickle.PickleError as pkl_err:
+        stderr.write("Error while serialising object:\n{}".format(pkl_err))
 
+def write_to_csv(data, fname):
 
+    try:
+        with open(fname, 'w', newline="") as f:
+            csv_writer = csv.writer(f, delimiter=';')
+            csv_writer.writerow(('city_name', 'weekday', 'hour', 'minute'))
+            for item in data:
+                city, day, time = item
+                csv_writer.writerow((city, day, time[0], time[1]))
+    except csv.Error as err:
+        stderr.write("Error while writing to csv file {}:\n{}".format(fname, err))
 
 # Task 3
 # You are given a text file that lists full file paths for a bunch of images
@@ -115,9 +162,9 @@ def read_sort_write(fname):
 if __name__ == "__main__":
 
 
-    read_sort_write("data/file_q5.txt")
+    # read_sort_write("data/file_q5c.txt")
 
-    # read_write_city_data("data/cities_and_times.txt")
+    cities_and_times("data/cities_and_times.txt")
 
     # image_categories("data/Training_01.txt")
 
