@@ -12,6 +12,12 @@
 # these (and many other) stats about Wikipedia pages can be obtained
 # from the Wikipedia’s XTools (https://xtools.wmflabs.org/).
 
+# Some useful links:
+# - requests developer interface (aka API)
+# http://docs.python-requests.org/en/master/api/
+# - tutorial + documentation for BeautifulSoup:
+# https://www.crummy.com/software/BeautifulSoup/bs4/doc
+
 
 import requests
 from bs4 import BeautifulSoup
