@@ -44,6 +44,7 @@ def deserialise_from_json(json_obj):
         cls = known_classes[cls_name]
         obj = cls.__new__(cls)
         for key, val in json_obj.items():
+            if key == '__classname__': continue
             setattr(obj, key, val)
         return obj
     else:
