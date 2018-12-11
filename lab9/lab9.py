@@ -22,14 +22,20 @@
 import requests
 from bs4 import BeautifulSoup
 from contextlib import closing
+from sys import stderr
 
 def get_content_from_url(url):
     '''
     Returns the content of the web page with the given URL
     '''
 
-    pass
+    def response_ok(r):
+        # print(r.headers)
+        content_type = r.headers['Content-Type']
+        return (r.status_code == 200) and ('html' in content_type)
 
+    with closing(requests.get(url)) as response:
+        return response.text if response_ok(response) else None
 
 
 def get_mathematicians_names(url):
@@ -38,8 +44,22 @@ def get_mathematicians_names(url):
     and returns a list of the mathematicians' names
     '''
 
-    pass
+    names = []
 
+    page_content = get_content_from_url(url)
+    if page_content:
+        page_soup = BeautifulSoup(page_content, 'html.parser')
+        ol_tags = page_soup.find_all('ol')
+        for ol_tag in ol_tags:
+            a_tags = ol_tag.find_all('a')
+            # for a_tag in a_tags:
+            #     names.append(a_tag.text)
+            names.extend([a_tag.text for a_tag in a_tags])
+
+    else:
+        stderr.write("Failed to retrieve mathematicians' names")
+
+    return names
 
 
 def get_pageview_counts(name):
@@ -50,8 +70,25 @@ def get_pageview_counts(name):
     as an int value.
     '''
 
-    pass
+    def page_views_tag(tag):
+        return (tag.name == 'a') and (tag.has_attr('href')) and \
+               ('latest-60' in tag['href'])
 
+    url = "https://xtools.wmflabs.org/articleinfo/en.wikipedia.org/" + name
+    page_content = get_content_from_url(url)
+    if page_content:
+        page_soup = BeautifulSoup(page_content, 'html.parser')
+        views_tag = page_soup.find(page_views_tag)
+        if views_tag:
+            views_count = views_tag.text.replace(',','')
+            try:
+                return int(views_count)
+            except ValueError as val_err:
+                stderr.write(str(val_err))
+                return None
+
+    stderr.write("Failed to retrieve page views for {}\n".format(name))
+    return None
 
 
 def clean_names(names):
@@ -79,12 +116,33 @@ def find_most_popular_mathematicians():
     - prints names for which hits could not have been pulled
     '''
 
-    pass
+    print("Collecting mathematicians' names...")
+    mathematicians_url = "http://www.fabpedigree.com/james/greatmm.htm"
+    names = get_mathematicians_names(mathematicians_url)
+    print("...done")
 
+    mathematicians = []
+    no_result = []
+    print("Collecting page views data ...")
+    for name in names:
+        page_views = get_pageview_counts(name)
+        if page_views:
+            mathematicians.append((name, page_views))
+        else:
+            no_result.append(name)
+
+
+    mathematicians = sorted(mathematicians, key=lambda item:item[1], reverse=True)
+
+    top_mathematicians = mathematicians[:10] if len(mathematicians) > 10 else mathematicians
+    for mathematican in top_mathematicians:
+        print("{} with {} page views".format(*mathematican))
 
 
 
 if __name__ == '__main__':
 
     find_most_popular_mathematicians()
-
+    # mathematicians_url = "http://www.fabpedigree.com/james/greatmm.htm"
+    # # print(get_mathematicians_names(mathematicians_url))
+    # print(get_pageview_counts("Isaac Newton"))
