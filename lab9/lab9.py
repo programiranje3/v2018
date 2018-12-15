@@ -99,7 +99,11 @@ def clean_names(names):
     view stats. The names are 'cleaned' so that they consists of only
     name and surname.
     """
-    pass
+    cleaned_names = []
+    for name in names:
+        name_parts = [name_part for name_part in name.split() if '.' not in name_part]
+        cleaned_names.append(" ".join(name_parts))
+    return cleaned_names
 
 
 
@@ -131,12 +135,21 @@ def find_most_popular_mathematicians():
         else:
             no_result.append(name)
 
+    cleaned_names = clean_names(no_result)
+    no_result = []
+    for name in cleaned_names:
+        page_views = get_pageview_counts(name)
+        if page_views:
+            mathematicians.append((name, page_views))
+        else:
+            no_result.append(name)
 
     mathematicians = sorted(mathematicians, key=lambda item:item[1], reverse=True)
 
     top_mathematicians = mathematicians[:10] if len(mathematicians) > 10 else mathematicians
-    for mathematican in top_mathematicians:
-        print("{} with {} page views".format(*mathematican))
+    print("Top mathematicians based on Wikipedia page views in the last 2 months:")
+    for num, mathematican in enumerate(top_mathematicians):
+        print("{}. {} with {} page views".format(num+1, *mathematican))
 
 
 
